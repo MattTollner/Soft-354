@@ -35,9 +35,15 @@ $(document).ready(function () {
             new User(data.user[i]);           
         }
 
-      
+        $('#userList').empty();
         for (i in User.list) {
             $('#userList').append('<li>' + User.list[i].username + '</li>');           
+        }
+    });
+
+    socket.on('removeLobbyUser', function (data) {
+        for (var i = 0; i < data.user.length; i++) {
+            delete User.list[data.user[i]];
         }
     });
 

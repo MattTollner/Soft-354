@@ -17,6 +17,7 @@ SocketList = {};
 
 
 var lobbyUsers = { user: [] };
+var removeLobbyUsers = { user: [] };
 
 io.on('connection', (socket) => {
     //Adds new connection to socket list
@@ -29,10 +30,9 @@ io.on('connection', (socket) => {
         for (i in User.list) {
             unames.push(User.list[i].username);
         }
-        console.log('checking username');
+       
         if (unames.length < 1)
-        {
-            console.log("First user");
+        {            
             socket.emit('checkUsernameResponse', { success: true, uname: uname });
             User.connection(socket, uname);
         } else {
@@ -44,19 +44,40 @@ io.on('connection', (socket) => {
             } else {
                 socket.emit('checkUsernameResponse', { success: true, uname: uname });
                 User.connection(socket, uname);                
-            }
-           
-        }
-
-       
-
-         
+            }           
+        }                   
 
     });
 
+    socket.on('disconnect', function () {
+      
+        console.log('User disconected');        
+        delete SocketList[socket.id];
+        User.disconnect(socket);
 
+    });
 
 });
+
+setInterval(function () {
+    var lobbyData = {
+        user: User.update()
+    }
+
+
+    for (var i in User.list)
+    {
+        var socket = SocketList[i];
+        socket.emit('initLobbyUser', lobbyData);
+        socket.emit('removeLobbyUser', removeLobbyUsers);
+    }
+    
+
+    lobbyUsers.user = [];
+    removeLobbyUsers.user = [];
+
+
+}, 1000 / 25); //FPS
 
 var User = function (socket, username)
 {
@@ -105,6 +126,12 @@ User.update = function ()
     return updatedUsers;
 }
 
+User.disconnect = function (socket)
+{
+    delete User.list[socket.id];
+    removeLobbyUsers.user.push(socket.id);
+}
+
 
 User.getAllUserInfo = function ()
 {
@@ -115,3 +142,5 @@ User.getAllUserInfo = function ()
 
     return users;
 }
+
+
