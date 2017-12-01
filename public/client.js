@@ -45,6 +45,20 @@ $(document).ready(function () {
         for (var i = 0; i < data.user.length; i++) {
             delete User.list[data.user[i]];
         }
+    }); 
+
+    //Lobby Chat Controls
+    $('#lobbyChatForm').submit(function (e) {
+        //Prevents page refresh
+        e.preventDefault();           
+         
+            socket.emit('lobbyChat', $('#lobbyChatInput').val());
+            $('#lobbyChatInput').val('');        
+    });
+
+
+    socket.on('printLobbyMsg', function (data) {
+        $('#lobbyChat').append('<div>' + data + '</div >');
     });
 
 });
@@ -59,3 +73,5 @@ var User = function (data) {
 }
 
 User.list = {};
+
+

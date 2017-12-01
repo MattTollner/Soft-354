@@ -51,10 +51,22 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', function () {
       
-        console.log('User disconected');        
+        console.log('User disconected');  
+        for (var i in User.list) {
+            SocketList[i].emit('printLobbyMsg', 'SERVER : ' + User.list[socket.id].username + ' has disconnected.');
+        }
         delete SocketList[socket.id];
         User.disconnect(socket);
+        
 
+    });
+
+    //Chat functions
+    socket.on('lobbyChat', function (data) {
+        console.log('recifecved ' + data);       
+        for (var i in User.list) {            
+            SocketList[i].emit('printLobbyMsg', User.list[socket.id].username + ': ' + data);
+        }
     });
 
 });
@@ -70,8 +82,7 @@ setInterval(function () {
         var socket = SocketList[i];
         socket.emit('initLobbyUser', lobbyData);
         socket.emit('removeLobbyUser', removeLobbyUsers);
-    }
-    
+    }    
 
     lobbyUsers.user = [];
     removeLobbyUsers.user = [];
@@ -105,12 +116,15 @@ User.list = {};
 //Used when user connects
 User.connection = function (socket, username)
 {
-    var user = User(socket, username);
-    console.log('initlobbyuser');
+    var user = User(socket, username);    
     socket.emit('initLobbyUser', {
         id: socket.id,
         user: User.getAllUserInfo(),
     });
+
+    for (var i in User.list) {
+        SocketList[i].emit('printLobbyMsg', 'SERVER : ' + User.list[socket.id].username + ' has joined the lobby.');
+    }
 }
 
 //Runs every frame
