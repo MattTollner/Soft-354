@@ -23,6 +23,39 @@ io.on('connection', (socket) => {
     SocketList[socket.id] = socket;
     console.log('Socket ' + socket.id + ' just connected');
 
+    socket.on('checkUsername', function (uname) {
+       var unames = [];
+
+        for (i in User.list) {
+            unames.push(User.list[i].username);
+        }
+        console.log('checking username');
+        if (unames.length < 1)
+        {
+            console.log("First user");
+            socket.emit('checkUsernameResponse', { success: true, uname: uname });
+            User.connection(socket, uname);
+        } else {
+
+            if (unames.includes(uname))
+            {
+                socket.emit('checkUsernameResponse', { success: false, uname: uname });
+                
+            } else {
+                socket.emit('checkUsernameResponse', { success: true, uname: uname });
+                User.connection(socket, uname);                
+            }
+           
+        }
+
+       
+
+         
+
+    });
+
+
+
 });
 
 var User = function (socket, username)
