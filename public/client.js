@@ -1,5 +1,7 @@
 var socket = io({ transports: ['websocket'], upgrade: false });
 var thisUserName = "";
+
+
 $(document).ready(function () {
     
 
@@ -17,14 +19,37 @@ $(document).ready(function () {
 
     socket.on('checkUsernameResponse', function (data) {
         if (data.success) {
-            thisUserName = data.uname;            
+            $('#loginDiv').hide();
+            $('#lobbyDiv').show();
+            thisUserName = data.uname
+            
         }
-        else if (!data.success) {
-                 
+        else if (!data.success) {                 
             alert(data.uname + ' already in use');
-
         }
     });
 
+    socket.on('initLobbyUser', function (data) {
+        
+        for (var i = 0; i < data.user.length; i++) {
+            new User(data.user[i]);           
+        }
+
+      
+        for (i in User.list) {
+            $('#userList').append('<li>' + User.list[i].username + '</li>');           
+        }
+    });
 
 });
+
+var User = function (data) {
+    var self = {};
+    self.id = data.id;
+    self.username = data.username;
+    User.list[self.id] = self;
+
+    return self;
+}
+
+User.list = {};

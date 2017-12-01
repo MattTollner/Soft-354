@@ -85,6 +85,7 @@ User.list = {};
 User.connection = function (socket, username)
 {
     var user = User(socket, username);
+    console.log('initlobbyuser');
     socket.emit('initLobbyUser', {
         id: socket.id,
         user: User.getAllUserInfo(),
