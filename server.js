@@ -6,9 +6,14 @@ var io = socketio(server);
 
 app.use(express.static(__dirname + '/public')); 
 
+app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js')); // redirect bootstrap JS
+app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css')); // redirect CSS bootstrap
+
 app.get('/', function (req, res, next) {
     res.sendFile(__dirname + '/static/index.html');    
 });
+
+
 
 
 console.log("Server stared on port 8080");
@@ -24,6 +29,12 @@ io.on('connection', (socket) => {
     SocketList[socket.id] = socket;
     console.log('Socket ' + socket.id + ' just connected');
 
+    socket.join('lobbyRoom');
+    
+    console.log(socket.rooms);
+    
+    
+
     socket.on('checkUsername', function (uname) {
        var unames = [];
 
@@ -32,7 +43,13 @@ io.on('connection', (socket) => {
         }
        
         if (unames.length < 1)
-        {            
+        {      
+            leaveRooms(socket);
+            //Time out to 0 to ensure it get to the next event loop
+            setTimeout(() => {
+                socket.join('lobbyRoom');
+            }, 0);
+
             socket.emit('checkUsernameResponse', { success: true, uname: uname });
             User.connection(socket, uname);
         } else {
@@ -41,7 +58,16 @@ io.on('connection', (socket) => {
             {
                 socket.emit('checkUsernameResponse', { success: false, uname: uname });
                 
-            } else {
+            } else { 
+                leaveRooms(socket);
+                //Time out to 0 to ensure it get to the next event loop
+                setTimeout(() => {
+                    socket.join('lobbyRoom');
+                }, 0);
+
+
+                socket.emit('event', uname + ' joined the lobby');
+                socket.broadcast.to('lobbyRoom').emit('event', uname + ' joined room lobbyRoom');
                 socket.emit('checkUsernameResponse', { success: true, uname: uname });
                 User.connection(socket, uname);                
             }           
@@ -69,7 +95,20 @@ io.on('connection', (socket) => {
         }
     });
 
+    //Load game
+    socket.on('startGame', function (data) {
+        console.log('detected' + socket.rooms);     
+
+        io.sockets.in('lobbyRoom').emit('alert');
+    });
+
 });
+
+function leaveRooms(socket) {
+    Object.keys(socket.rooms).filter((r) => r != socket.id)
+        //Leave the pre existing room
+        .forEach((r) => socket.leave(r));
+}
 
 setInterval(function () {
     var lobbyData = {
@@ -77,12 +116,15 @@ setInterval(function () {
     }
 
 
-    for (var i in User.list)
-    {
-        var socket = SocketList[i];
-        socket.emit('initLobbyUser', lobbyData);
-        socket.emit('removeLobbyUser', removeLobbyUsers);
-    }    
+    io.sockets.in('lobbyRoom').emit('initLobbyUser', lobbyData);
+    io.sockets.in('lobbyRoom').emit('removeLobbyUser', removeLobbyUsers);
+
+    //for (var i in User.list)
+    //{
+    //    var socket = SocketList[i];
+    //    socket.emit('initLobbyUser', lobbyData);
+    //    socket.emit('removeLobbyUser', removeLobbyUsers);
+    //}    
 
     lobbyUsers.user = [];
     removeLobbyUsers.user = [];

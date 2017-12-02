@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-
+    
 </head>
 <body>
 
@@ -22,16 +22,22 @@
             <input id="lobbyChatInput" type="text" style="width:500px">
         </form>
 
-      
+        
+
+        <button id="toGame1">World One</button>
+        <button id="toGame2">World Two</button>
+        <button id="toGame3">World Three</button>      
 
 
-        <ul id="userList">
-            List
+        <ul id="userList" class="list-group">
+            Player List
         </ul>
     </div> 
     
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script src="/js/bootstrap.min.js"></script>
     <script src="/client.js"></script>
 </body>
 </html>  

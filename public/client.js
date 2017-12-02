@@ -2,8 +2,7 @@ var socket = io({ transports: ['websocket'], upgrade: false });
 var thisUserName = "";
 
 
-$(document).ready(function () {
-    
+$(document).ready(function () {    
 
     $("#joinLobby").click(function () {
        
@@ -37,7 +36,7 @@ $(document).ready(function () {
 
         $('#userList').empty();
         for (i in User.list) {
-            $('#userList').append('<li>' + User.list[i].username + '</li>');           
+            $('#userList').append('<li class="list-group-item">' + User.list[i].username + '</li>');           
         }
     });
 
@@ -60,6 +59,26 @@ $(document).ready(function () {
     socket.on('printLobbyMsg', function (data) {
         $('#lobbyChat').append('<div>' + data + '</div >');
     });
+
+    socket.on('alert', function () {
+        alert('Test Ale');
+    });
+
+    //Game load
+    $('#toGame1').click(function () {
+        //$('#loginDiv').hide();
+        //$('#lobbyDiv').hide();
+        //$('#gameDiv').show();
+
+        socket.emit('startGame', { room: 'gameRoom1', username: thisUserName });
+    });
+
+    var addLi = (message) => {
+        $('#userList').append('<li class="list-group-item">' + message + '</li>');
+    };
+
+    socket.on('event', addLi);
+
 
 });
 
