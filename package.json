@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+	"pretest": "eslint --ignore-path .gitignore ."
   },
   "author": "",
   "license": "ISC",
@@ -12,5 +13,9 @@
     "express": "^4.16.2",
     "jquery": "^3.2.1",
     "socket.io": "^2.0.4"
+  },
+  "devDependencies": {
+    "eslint": "^4.12.1",
+    "eslint-config-strongloop": "^2.1.0"
   }
 }
