@@ -18,7 +18,8 @@ app.get('/', function (req, res, next) {
 
 console.log("Server stared on port 8080");
 
-SocketList = {};
+SocketList = {}
+
 
 var boxes = [];
 
@@ -120,7 +121,7 @@ io.on('connection', (socket) => {
             }           
         }                   
 
-    });
+    })
 
     socket.on('disconnect', function () {
       

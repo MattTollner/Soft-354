@@ -107,10 +107,7 @@ $(document).ready(function () {
         for (var i = 0; i < data.player.length; i++) {
           
             var updatedP = data.player[i];
-            if (i === 0) {
-                //console.log('PRESSING RIGHT = ' + updatedP.pressingRight);
-                //socket.emit('console', updatedP.pressingRight);
-            }
+        
             var player = Player.list[updatedP.id];
             if (player) {
                 if (updatedP.x !== undefined) { player.x = updatedP.x; }
